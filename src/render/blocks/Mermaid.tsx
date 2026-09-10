@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { IRMermaid } from '../../core/ir'
 import { useTheme } from '../../ui/theme'
+import { useStaticRender } from '../staticContext'
 
 /**
  * Mermaid is loaded lazily and only when a document actually contains a
@@ -15,12 +16,14 @@ let counter = 0
 
 export function MermaidBlock({ block }: { block: IRMermaid }) {
   const { resolved } = useTheme()
+  const { isStatic, diagramRuntime } = useStaticRender()
   const [svg, setSvg] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)
   const idRef = useRef(`mermaid-${(counter += 1)}`)
 
   useEffect(() => {
     let cancelled = false
+    if (isStatic) return
 
     void (async () => {
       try {
@@ -47,7 +50,25 @@ export function MermaidBlock({ block }: { block: IRMermaid }) {
     return () => {
       cancelled = true
     }
-  }, [block.value, resolved])
+  }, [block.value, resolved, isStatic])
+
+  if (isStatic) {
+    // Mermaid needs a layout engine to measure text, so there is no way to
+    // draw the diagram without a browser. Either the output carries the
+    // runtime and the diagram draws itself when the file is opened, or it
+    // shows the source — which is at least honest and still says what the
+    // author meant.
+    return diagramRuntime ? (
+      <div className="mermaid-figure">
+        <pre className="mermaid">{block.value}</pre>
+      </div>
+    ) : (
+      <figure className="code-figure">
+        <div className="code-bar"><span className="code-label">mermaid</span></div>
+        <pre className="code-block"><code>{block.value}</code></pre>
+      </figure>
+    )
+  }
 
   if (failed) {
     return (

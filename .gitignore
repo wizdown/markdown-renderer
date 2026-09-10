@@ -25,3 +25,5 @@ dist/
 *.log
 npm-debug.log*
 yarn-error.log*
+dist-cli/
+public/

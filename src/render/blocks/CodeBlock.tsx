@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { IRCode } from '../../core/ir'
 import { highlight } from './highlighter'
+import { useStaticRender } from '../staticContext'
 
 /**
  * Syntax highlighting is async (grammars load on demand) but the code must be
@@ -9,13 +10,16 @@ import { highlight } from './highlighter'
  * stays plain — never an error, never an empty block.
  */
 export function CodeBlock({ block }: { block: IRCode }) {
-  const [html, setHtml] = useState<string | null>(null)
+  const { isStatic, highlighted } = useStaticRender()
+  // In a static render the markup was resolved before the render started, so
+  // it is available on the first pass rather than after an effect.
+  const [html, setHtml] = useState<string | null>(() => highlighted.get(block.id) ?? null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     let cancelled = false
-    if (block.lang === null) {
-      setHtml(null)
+    if (isStatic || block.lang === null) {
+      if (block.lang === null) setHtml(null)
       return
     }
     void highlight(block.value, block.lang, block.highlightLines).then((result) => {
@@ -24,7 +28,7 @@ export function CodeBlock({ block }: { block: IRCode }) {
     return () => {
       cancelled = true
     }
-  }, [block.value, block.lang, block.highlightLines])
+  }, [block.value, block.lang, block.highlightLines, isStatic])
 
   useEffect(() => {
     if (!copied) return
@@ -45,9 +49,13 @@ export function CodeBlock({ block }: { block: IRCode }) {
     <figure className="code-figure">
       <div className="code-bar">
         <span className="code-label">{label}</span>
-        <button type="button" className="code-copy" onClick={copy}>
-          {copied ? 'Copied' : 'Copy'}
-        </button>
+        {/* A copy button in a statically rendered file would need a script to
+            do anything, and the reader can select the text regardless. */}
+        {!isStatic && (
+          <button type="button" className="code-copy" onClick={copy}>
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+        )}
       </div>
       {html === null ? (
         <pre className="code-block"><code>{block.value}</code></pre>

@@ -9,7 +9,10 @@ inference, render and export are all deterministic.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # the app: open, edit, inspect, present
+
+npm run build:cli
+node dist-cli/mdr.mjs talk.md      # -> talk.html, one self-contained file
 ```
 
 ## The idea
@@ -110,16 +113,58 @@ Container directives work too, for authoring rather than correcting:
 | <kbd>F</kbd> | Fullscreen |
 | <kbd>Esc</kbd> | Back to reading |
 
-## Export
+## Sharing what you render
 
-**Export** writes a single self-contained HTML file: markup, styles,
-highlighted code, rendered diagrams and web fonts all inlined, with both views
-and a small script to switch between them. No server, no network, no build
-step — it opens on the conference-room laptop.
+The artifact you hand to other people is **one HTML file**. Markup, styles,
+highlighted code, maths fonts and both views are inlined, along with a small
+script to switch between them. No server, no network, no install — it opens
+from a filesystem, on any machine, offline.
 
-The exported file's script only shows and hides what the renderer already
-emitted; it has no idea what a panel is. All of that stays in `buildDeck`, so
-the export cannot drift from the app.
+Two ways to produce one:
+
+**In the app** — the **Export** button. This one runs in a real browser, so
+diagrams are pre-rendered to SVG and the file stays small (~500 KB).
+
+**On the command line** — `mdr`, which needs no browser at all:
+
+```bash
+mdr talk.md                  # -> talk.html, ~430 KB
+mdr talk.md -o build/x.html  # choose the output path
+mdr talk.md --stdout         # pipe it somewhere
+mdr talk.md --diagrams       # inline the diagram runtime (see below)
+```
+
+### The one thing the CLI cannot do
+
+Mermaid needs a browser layout engine to measure text, so there is no way to
+draw a diagram in Node. The CLI therefore has two honest options and no third:
+
+| | Result | Size |
+| --- | --- | --- |
+| default | diagrams shown as their source | ~430 KB |
+| `--diagrams` | diagrams draw themselves when opened | ~3.9 MB |
+| app **Export** | diagrams pre-rendered to SVG | ~500 KB |
+
+`--diagrams` inlines mermaid's self-contained build, which is about 3.4 MB.
+There is no smaller version: the ESM entry lazy-loads its diagram types by
+relative path, which cannot work from an inline script, and bundling from
+source saves nothing because mermaid registers every diagram type eagerly.
+A ninefold jump in file size for one flowchart should be your decision, so it
+is opt-in.
+
+If a document has diagrams and you want a small file, use the app's Export.
+
+### Why there is no binary
+
+Every way of packaging JavaScript as an executable embeds a whole runtime:
+Bun's `--compile` lands around 55–60 MB, Deno's around 80 MB, Node's SEA
+around 110 MB. None of them are small, and a native rewrite that *would* be
+small (~8 MB) would mean giving up Shiki, KaTeX and Mermaid.
+
+`npx` gets you the same thing at 0 MB for anyone who has Node, and the file
+you actually share needs nothing installed at all. If you do need a Node-free
+binary later, `bun build --compile` over `src/cli-entry.ts` is a packaging
+step rather than a change to any of this.
 
 ## Supported markdown
 
@@ -138,7 +183,8 @@ and [`test/conformance.test.ts`](test/conformance.test.ts) checks it.
 ```
 src/core/      parse → sections → rules → IR      (no React, no DOM, no network)
 src/render/    IR → React                          (doc, deck, every block kind)
-src/export/    IR → one self-contained .html
+src/export/    IR → one self-contained .html       (browser and Node paths)
+src/cli.ts     the `mdr` command
 src/ui/        toolbar, TOC, theme
 fixtures/      kitchen-sink.md, sample.md
 test/          conformance, rules, overrides, deck, sanitizer
@@ -147,11 +193,24 @@ test/          conformance, rules, overrides, deck, sanitizer
 `src/core` has no dependency on React or the DOM, which is why the rules are
 testable in isolation and why the whole inference layer runs in Node.
 
+The export has two front ends over one set of components. The browser path
+lets Shiki, KaTeX and Mermaid settle in a live document and serializes the
+result; the Node path resolves the same work up front and renders in a single
+`react-dom/server` pass. Neither has its own copy of the renderer, so the two
+cannot drift — and because the Node path exists, the exported file is covered
+by the test suite rather than only by opening a browser.
+
 ## Scripts
 
 ```bash
 npm run dev        # dev server
 npm test           # vitest
 npm run typecheck  # tsc --noEmit
-npm run build      # production build
+npm run build      # typecheck, then app and CLI
+npm run build:cli  # just the CLI
 ```
+
+## Licence
+
+MIT. This repository is published read-only and does not take pull requests —
+see [CONTRIBUTING.md](CONTRIBUTING.md). Fork away.

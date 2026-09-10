@@ -1,16 +1,18 @@
 {
   "name": "markdown-renderer",
-  "private": true,
   "version": "0.1.0",
   "type": "module",
   "description": "Renders ordinary markdown as a rich reading document and, on a keypress, as a presentation. No LLM required.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b --noEmit && vite build",
+    "build": "tsc -b --noEmit && vite build && vite build --config vite.config.cli.ts",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "build:app": "vite build",
+    "build:cli": "vite build --config vite.config.cli.ts",
+    "mdr": "node dist-cli/mdr.mjs"
   },
   "dependencies": {
     "katex": "^0.16.11",
@@ -36,5 +38,30 @@
     "typescript": "^5.7.2",
     "vite": "^6.0.3",
     "vitest": "^2.1.8"
+  },
+  "bin": {
+    "mdr": "./dist-cli/mdr.mjs"
+  },
+  "files": [
+    "dist-cli",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "author": "Abhishek Gupta",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wizdown/markdown-renderer.git"
+  },
+  "keywords": [
+    "markdown",
+    "presentation",
+    "slides",
+    "renderer",
+    "remark",
+    "offline"
+  ],
+  "engines": {
+    "node": ">=20"
   }
 }
