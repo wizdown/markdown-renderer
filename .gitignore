@@ -3,6 +3,8 @@ node_modules/
 
 # Build output
 dist/
+dist-cli/
+public/
 *.tsbuildinfo
 
 # Exported documents (generated, not source)
@@ -25,5 +27,3 @@ dist/
 *.log
 npm-debug.log*
 yarn-error.log*
-dist-cli/
-public/

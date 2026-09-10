@@ -1,54 +1,66 @@
 # markdown-renderer
 
-Takes an ordinary markdown file and renders it two ways from one tree: a rich
-reading document, and — on a keypress — a presentation.
+[![CI](https://github.com/wizdown/markdown-renderer/actions/workflows/ci.yml/badge.svg)](https://github.com/wizdown/markdown-renderer/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Status: beta](https://img.shields.io/badge/status-beta-orange.svg)](#status)
 
-No slide markers, no special authoring format, and **no LLM anywhere in the
-required path**. The whole pipeline runs offline with no API key: parse,
-inference, render and export are all deterministic.
+Render an ordinary markdown file as a rich reading document — and, on a
+keypress, as a presentation. Same file, same tree, no slide markers and no
+special authoring format.
+
+Nothing in the required path uses an LLM. Parsing, inference, rendering and
+export are deterministic and run offline with no API key.
+
+![The reading view: a table of contents, a callout, and a list promoted to a card grid](docs/images/reading.png)
+
+Press <kbd>P</kbd> and the same document becomes a deck:
+
+![The presenting view: a table rendered as a line chart, with a Show table toggle](docs/images/presenting.png)
+
+## Quick start
+
+Requires **Node 20+**.
 
 ```bash
+git clone https://github.com/wizdown/markdown-renderer.git
+cd markdown-renderer
 npm install
-npm run dev        # the app: open, edit, inspect, present
+npm run dev          # http://localhost:5173
+```
 
+The app opens with a sample document. Use **Open** to load your own markdown,
+**Present** (or <kbd>P</kbd>) to switch views, and **Export** to save the
+result as a single HTML file.
+
+## Export from the command line
+
+```bash
 npm run build:cli
-node dist-cli/mdr.mjs talk.md      # -> talk.html, one self-contained file
+node dist-cli/mdr.mjs talk.md              # -> talk.html
+node dist-cli/mdr.mjs talk.md -o out.html  # choose the output path
+node dist-cli/mdr.mjs talk.md --stdout     # pipe it somewhere
+node dist-cli/mdr.mjs talk.md --diagrams   # inline the mermaid runtime
 ```
 
-## The idea
+Run `npm link` in the clone to get `mdr` on your `PATH`. The package is not on
+npm yet, so there is no `npx` route.
 
-Markdown's structure is thin. It gives you headings, lists, paragraphs and
-tables, and almost nothing about importance, relationship or grouping. A
-renderer that wants to be more than a stylesheet has to get that structure
-somewhere.
+Either way the artifact is **one HTML file**. Markup, styles, highlighted code,
+maths fonts and both views are inlined, along with a small script to switch
+between them — no server, no network, no install. It opens from a filesystem,
+offline, on any machine.
 
-This one gets it from the *shape* of the content — measurable things like item
-count, item length, nesting depth and how many table cells parse as numbers.
-It never reads for meaning, because that would need a model, and needing a
-model is the one thing it must not do.
+The CLI cannot draw mermaid diagrams (that needs a browser layout engine), so
+it either shows them as source (~430 KB) or inlines the mermaid runtime with
+`--diagrams` (~3.9 MB). The app's **Export** pre-renders them to SVG instead
+(~500 KB). See [docs/design.md](docs/design.md#exporting) for why.
 
-The cost of that choice is a narrower rule set. Where a signal is genuinely
-ambiguous, the answer is "leave it as prose and let the author say what they
-meant", not "guess harder".
+## What it promotes
 
-## Pipeline
-
-```
-.md → remark (mdast) → sections → structural rules → Presentation IR → renderer
-                                        ↑
-                            directives + <!-- render: --> hints
-```
-
-The **Presentation IR** ([`src/core/ir.ts`](src/core/ir.ts)) is the contract
-between *what the content is* and *how it gets drawn*. Every renderer — reading
-view, deck, static export — consumes only the IR and never sees mdast. That is
-what lets one tree render three ways without three parsers, and why switching
-between reading and presenting keeps your place.
-
-## What the rules look for
-
-Each rule is a structural test. All of them are refusable, and refusing is the
-common case.
+Markdown gives you headings, lists, paragraphs and tables, and almost nothing
+about importance, relationship or grouping. This renderer recovers that from
+the *shape* of the content — item count, item length, nesting depth, how many
+table cells parse as numbers — never from reading it for meaning.
 
 | Signal | Becomes |
 | --- | --- |
@@ -60,27 +72,16 @@ common case.
 | 2–3 consecutive **sub**-sections whose bodies are each one list | side-by-side columns |
 | Unordered list nested 3+ levels deep | collapsible outline |
 
-Deliberate refusals worth knowing about:
-
-- **Comparisons only fire below H2.** Three consecutive H2s each holding a list
-  is an ordinary document, not a comparison; hoisting the document's spine into
-  columns destroys the structure a reader navigates by.
-- **Charts refuse mixed units.** `50%` beside `3.2s` is not one series, and
-  putting them on one axis would be a lie. The table stays a table.
-- **Task lists are never collapsed or carded.** A checklist's value is seeing
-  every unchecked box at once.
-- **Ordinary quotations stay quotations.** Only a recognised label makes a
-  callout.
-
-The chart is always a *view* of its table, never a replacement: the **Show
-table** toggle is permanent, which is also what makes the palette's lighter
-hues acceptable.
+Every rule is refusable, and refusing is the common case: charts refuse mixed
+units, task lists are never collapsed, ordinary quotations stay quotations.
+[docs/design.md](docs/design.md#deliberate-refusals) covers the refusals and
+the reasoning behind them.
 
 ## When it guesses wrong
 
 Turn on **Inspect**. Every promoted block wears a chip naming the rule that
-produced it, and the menu writes your correction back into the markdown as a
-single line:
+produced it, and the menu writes your correction back into the markdown as one
+line:
 
 ```md
 <!-- render: prose -->
@@ -113,72 +114,19 @@ Container directives work too, for authoring rather than correcting:
 | <kbd>F</kbd> | Fullscreen |
 | <kbd>Esc</kbd> | Back to reading |
 
-## Sharing what you render
-
-The artifact you hand to other people is **one HTML file**. Markup, styles,
-highlighted code, maths fonts and both views are inlined, along with a small
-script to switch between them. No server, no network, no install — it opens
-from a filesystem, on any machine, offline.
-
-Two ways to produce one:
-
-**In the app** — the **Export** button. This one runs in a real browser, so
-diagrams are pre-rendered to SVG and the file stays small (~500 KB).
-
-**On the command line** — `mdr`, which needs no browser at all:
-
-```bash
-mdr talk.md                  # -> talk.html, ~430 KB
-mdr talk.md -o build/x.html  # choose the output path
-mdr talk.md --stdout         # pipe it somewhere
-mdr talk.md --diagrams       # inline the diagram runtime (see below)
-```
-
-### The one thing the CLI cannot do
-
-Mermaid needs a browser layout engine to measure text, so there is no way to
-draw a diagram in Node. The CLI therefore has two honest options and no third:
-
-| | Result | Size |
-| --- | --- | --- |
-| default | diagrams shown as their source | ~430 KB |
-| `--diagrams` | diagrams draw themselves when opened | ~3.9 MB |
-| app **Export** | diagrams pre-rendered to SVG | ~500 KB |
-
-`--diagrams` inlines mermaid's self-contained build, which is about 3.4 MB.
-There is no smaller version: the ESM entry lazy-loads its diagram types by
-relative path, which cannot work from an inline script, and bundling from
-source saves nothing because mermaid registers every diagram type eagerly.
-A ninefold jump in file size for one flowchart should be your decision, so it
-is opt-in.
-
-If a document has diagrams and you want a small file, use the app's Export.
-
-### Why there is no binary
-
-Every way of packaging JavaScript as an executable embeds a whole runtime:
-Bun's `--compile` lands around 55–60 MB, Deno's around 80 MB, Node's SEA
-around 110 MB. None of them are small, and a native rewrite that *would* be
-small (~8 MB) would mean giving up Shiki, KaTeX and Mermaid.
-
-`npx` gets you the same thing at 0 MB for anyone who has Node, and the file
-you actually share needs nothing installed at all. If you do need a Node-free
-binary later, `bun build --compile` over `src/cli-entry.ts` is a packaging
-step rather than a change to any of this.
-
 ## Supported markdown
 
 CommonMark and GFM (tables, task lists, strikethrough, autolinks, footnotes),
-plus YAML/TOML frontmatter, `$math$` via KaTeX, ```mermaid diagrams, container
-directives, reference links and images, code-fence metadata
-(``` ```ts title="a.ts" {2-4} ```), and raw HTML through a strict allowlist
+plus YAML/TOML frontmatter, `$math$` via KaTeX, `` ```mermaid `` diagrams,
+container directives, reference links and images, code-fence metadata
+(`` ```ts title="a.ts" {2-4} ``), and raw HTML through a strict allowlist
 sanitizer.
 
-"Supports all markdown elements" is a test-suite claim, not an architecture
-claim — [`fixtures/kitchen-sink.md`](fixtures/kitchen-sink.md) is that claim,
-and [`test/conformance.test.ts`](test/conformance.test.ts) checks it.
+That is a test-suite claim rather than an architecture claim —
+[`fixtures/kitchen-sink.md`](fixtures/kitchen-sink.md) is the claim and
+[`test/conformance.test.ts`](test/conformance.test.ts) checks it.
 
-## Layout
+## Project layout
 
 ```
 src/core/      parse → sections → rules → IR      (no React, no DOM, no network)
@@ -190,16 +138,6 @@ fixtures/      kitchen-sink.md, sample.md
 test/          conformance, rules, overrides, deck, sanitizer
 ```
 
-`src/core` has no dependency on React or the DOM, which is why the rules are
-testable in isolation and why the whole inference layer runs in Node.
-
-The export has two front ends over one set of components. The browser path
-lets Shiki, KaTeX and Mermaid settle in a live document and serializes the
-result; the Node path resolves the same work up front and renders in a single
-`react-dom/server` pass. Neither has its own copy of the renderer, so the two
-cannot drift — and because the Node path exists, the exported file is covered
-by the test suite rather than only by opening a browser.
-
 ## Scripts
 
 ```bash
@@ -210,7 +148,25 @@ npm run build      # typecheck, then app and CLI
 npm run build:cli  # just the CLI
 ```
 
-## Licence
+## Documentation
 
-MIT. This repository is published read-only and does not take pull requests —
-see [CONTRIBUTING.md](CONTRIBUTING.md). Fork away.
+[docs/design.md](docs/design.md) — the Presentation IR, why inference is
+structural rather than semantic, what the rules refuse and why, and how the
+two export paths stay in sync.
+
+## Status
+
+**This is beta.** It works and it is tested, but the rule set, the IR and the
+override syntax are all still moving, and releases before 1.0 may break them.
+
+Pull requests are **not being accepted yet** — the internals change too often
+for outside patches to be fair to anyone. That is a temporary policy and will
+be revisited as things settle; see [CONTRIBUTING.md](CONTRIBUTING.md). Bug
+reports are genuinely welcome in the meantime, through
+[issues](https://github.com/wizdown/markdown-renderer/issues).
+
+Forks are welcome and always will be.
+
+## License
+
+[MIT](LICENSE) © Abhishek Gupta
