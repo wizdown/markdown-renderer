@@ -1,0 +1,39 @@
+# GitHub does not let a public repository turn pull requests off, and forking
+# cannot be disabled on public repos either. This closes incoming pull requests
+# automatically so the repository behaves as read-only in practice.
+#
+# It deliberately does not check out the head ref, so nothing from the fork is
+# ever executed here.
+name: Close pull requests
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              'Thanks for the interest, but this repository is published as read-only',
+              'and does not accept pull requests. Please feel free to fork it and',
+              'carry on in your own copy.',
+            ].join(' ')
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body,
+            })
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              state: 'closed',
+            })
