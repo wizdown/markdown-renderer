@@ -16,6 +16,10 @@ permissions:
 
 jobs:
   close:
+    # Only outside contributions. A pull request from a branch in this
+    # repository is the maintainer's own, and closing those would make the
+    # repository's normal workflow impossible.
+    if: github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7
