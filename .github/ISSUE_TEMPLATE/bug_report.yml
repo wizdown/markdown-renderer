@@ -1,0 +1,53 @@
+name: Bug report
+description: Something renders, exports or behaves wrongly.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying the beta. A small snippet that reproduces the problem
+        is worth far more than a description of it.
+
+  - type: textarea
+    id: markdown
+    attributes:
+      label: Markdown that reproduces it
+      description: The smallest input that still shows the problem.
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what you got
+      description: For a rule firing wrongly, say which rule and which way it went wrong.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where it happens
+      multiple: true
+      options:
+        - Reading view
+        - Presenting view
+        - Export from the app
+        - Export from the CLI (mdr)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: 0.1.0, or the commit SHA you are on
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: Node version and browser
+      placeholder: Node 22.2.0, Firefox 128

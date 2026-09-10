@@ -1,6 +1,7 @@
 # GitHub does not let a public repository turn pull requests off, and forking
 # cannot be disabled on public repos either. This closes incoming pull requests
-# automatically so the repository behaves as read-only in practice.
+# automatically while the project is in beta and not yet taking contributions.
+# Remove this workflow when pull requests are opened up.
 #
 # It deliberately does not check out the head ref, so nothing from the fork is
 # ever executed here.
@@ -21,10 +22,17 @@ jobs:
         with:
           script: |
             const body = [
-              'Thanks for the interest, but this repository is published as read-only',
-              'and does not accept pull requests. Please feel free to fork it and',
-              'carry on in your own copy.',
-            ].join(' ')
+              'Thanks for this — but the project is still in beta and is not accepting',
+              'pull requests yet, so this is being closed automatically. That is about',
+              'the state of the internals, which still change often, and not about your',
+              'change.',
+              '',
+              'This is temporary. Contributions will be opened up once things settle;',
+              'see [CONTRIBUTING.md](../blob/master/CONTRIBUTING.md).',
+              '',
+              'In the meantime bug reports are very welcome as issues, and you are free',
+              'to carry this in a fork.',
+            ].join('\n')
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
