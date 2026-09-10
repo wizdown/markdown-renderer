@@ -1,0 +1,192 @@
+/*
+ * Presentation mode.
+ *
+ * Panels scale their type to the viewport rather than to a fixed slide size,
+ * so a projector, a laptop and a phone each get something readable instead of
+ * one 4:3 rectangle shrunk to fit. The unit is `clamp()` on a root-relative
+ * font size; every block below inherits from it, which is why the document
+ * components need no deck-specific variants.
+ */
+
+.deck {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* A flex child of .workspace: without these it collapses to its content
+     width and the panel stops short of the viewport edge. */
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+.panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: clamp(2rem, 5vh, 4rem) clamp(1.5rem, 6vw, 6rem) 5rem;
+  font-size: clamp(1rem, 1.35vw + 0.55rem, 1.5rem);
+  line-height: 1.6;
+  animation: panel-in 240ms ease;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.panel-title {
+  margin: 0 0 clamp(1rem, 2.5vh, 2rem);
+  font-size: 1.9em;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 680;
+  max-width: 22ch;
+}
+
+/* Prose keeps a readable measure; wide content earns the whole panel. The cap
+   lives on the individual blocks rather than the container, because a parent
+   max-width would stop a chart from ever growing past it. */
+.panel-body { max-width: none; }
+.panel-body > .block { max-width: 62ch; }
+
+.panel-body > .block:has(> .chart-figure),
+.panel-body > .block:has(> .comparison),
+.panel-body > .block:has(> .cards),
+.panel-body > .block:has(> .table-scroll),
+.panel-body > .block:has(> .md-figure),
+.panel-body > .block:has(> .mermaid-figure) {
+  max-width: min(100%, 1100px);
+}
+
+.panel-body .md-heading { scroll-margin-top: 1rem; }
+.panel-body h3.md-heading { font-size: 1.15em; }
+.panel-body .md-paragraph { margin-bottom: 0.9em; }
+.panel-body .md-list { padding-left: 1.3em; }
+.panel-body .md-list > li { margin-bottom: 0.5em; }
+
+/* The doc-mode anchor affordance is noise in front of an audience. */
+.panel-body .heading-anchor { display: none; }
+
+.panel-body .card { padding: 1em; font-size: 0.9em; }
+.panel-body .definition { padding: 0.75em 1em; }
+.panel-body .code-block,
+.panel-body .code-block pre { font-size: 0.62em; }
+.panel-body .md-table { font-size: 0.7em; }
+
+.deck-controls {
+  position: absolute;
+  bottom: clamp(0.75rem, 2vh, 1.5rem);
+  right: clamp(1rem, 3vw, 2.5rem);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.4rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-2);
+  opacity: 0.35;
+  transition: opacity 160ms ease;
+}
+
+.deck:hover .deck-controls,
+.deck-controls:focus-within { opacity: 1; }
+
+.deck-controls button {
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.deck-controls button:hover:not(:disabled) { background: var(--surface-2); color: var(--text-primary); }
+.deck-controls button:disabled { opacity: 0.3; cursor: default; }
+
+.deck-position {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  padding: 0 0.35rem;
+}
+
+.deck-step { color: var(--text-muted); }
+
+.deck-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--surface-2);
+}
+
+.deck-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 220ms ease;
+}
+
+/* --- the exported file --------------------------------------------------- */
+
+.export-shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+.export-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface-0);
+  border-bottom: 1px solid var(--border);
+}
+
+.export-title { font-weight: 650; font-size: 0.875rem; }
+.export-actions { display: flex; align-items: center; gap: 0.35rem; }
+
+.export-actions button {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8125rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.export-actions button:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+.export-main { flex: 1; min-height: 0; position: relative; }
+
+.exported .deck-export { height: calc(100vh - 3rem); }
+.exported .deck-export .panel { height: 100%; }
+
+.export-hint {
+  padding: 0.75rem 1rem;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.exported[data-mode='deck'] .export-hint,
+html[data-mode='deck'] .export-hint { display: none; }
+
+.export-hint kbd {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  background: var(--surface-2);
+}

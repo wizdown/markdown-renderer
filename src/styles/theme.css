@@ -1,0 +1,196 @@
+/*
+ * Theme tokens.
+ *
+ * Every colour in the app resolves through a role token defined here, so the
+ * light/dark swap happens in one place and no component hard-codes a hex.
+ *
+ * Three scopes, deliberately: bare :root is the complete light palette; the
+ * media query covers the OS setting; the [data-theme] scope covers the in-app
+ * toggle and must win in both directions.
+ */
+
+:root {
+  color-scheme: light;
+
+  --surface-0: #f7f6f3;
+  --surface-1: #fcfcfb;
+  --surface-2: #f1f0ec;
+  --surface-raised: #ffffff;
+
+  --text-primary: #171614;
+  --text-secondary: #52514e;
+  --text-muted: #85837c;
+  --text-inverse: #fcfcfb;
+
+  --border: #e3e1da;
+  --border-strong: #cdcac0;
+
+  --accent: #2a78d6;
+  --accent-soft: #e8f0fc;
+  --accent-text: #1c5cab;
+
+  /* Categorical series, in fixed slot order — never cycled, never re-ordered.
+     Validated for lightness, chroma, CVD separation and contrast in both
+     modes; see the note in Chart.tsx before changing any of these. */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+
+  --callout-note: #2a78d6;
+  --callout-note-bg: #eaf1fc;
+  --callout-tip: #1baf7a;
+  --callout-tip-bg: #e6f6f0;
+  --callout-important: #4a3aa7;
+  --callout-important-bg: #eceaf8;
+  --callout-warning: #eda100;
+  --callout-warning-bg: #fdf3de;
+  --callout-caution: #e34948;
+  --callout-caution-bg: #fceaea;
+  --callout-quote: #85837c;
+  --callout-quote-bg: #f1f0ec;
+
+  --code-bg: #f4f3ef;
+  --code-border: #e3e1da;
+  --highlight-bg: #fdf3de;
+
+  --shadow-1: 0 1px 2px rgb(23 22 20 / 6%), 0 1px 1px rgb(23 22 20 / 4%);
+  --shadow-2: 0 4px 12px rgb(23 22 20 / 8%), 0 1px 3px rgb(23 22 20 / 6%);
+
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 14px;
+
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Inter, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+
+  --measure: 68ch;
+}
+
+/* Dark values are selected for the dark surface, not an automatic flip. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --surface-0: #121211;
+    --surface-1: #1a1a19;
+    --surface-2: #232322;
+    --surface-raised: #232322;
+
+    --text-primary: #f4f3ef;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8e8d84;
+    --text-inverse: #171614;
+
+    --border: #33332f;
+    --border-strong: #4a4a45;
+
+    --accent: #3987e5;
+    --accent-soft: #16243a;
+    --accent-text: #86b6ef;
+
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+
+    --callout-note: #3987e5;
+    --callout-note-bg: #15233a;
+    --callout-tip: #199e70;
+    --callout-tip-bg: #10251f;
+    --callout-important: #9085e9;
+    --callout-important-bg: #201d33;
+    --callout-warning: #c98500;
+    --callout-warning-bg: #2a2110;
+    --callout-caution: #e66767;
+    --callout-caution-bg: #301818;
+    --callout-quote: #8e8d84;
+    --callout-quote-bg: #232322;
+
+    --code-bg: #202020;
+    --code-border: #33332f;
+    --highlight-bg: #2a2110;
+
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow-2: 0 4px 14px rgb(0 0 0 / 45%);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface-0: #121211;
+  --surface-1: #1a1a19;
+  --surface-2: #232322;
+  --surface-raised: #232322;
+
+  --text-primary: #f4f3ef;
+  --text-secondary: #c3c2b7;
+  --text-muted: #8e8d84;
+  --text-inverse: #171614;
+
+  --border: #33332f;
+  --border-strong: #4a4a45;
+
+  --accent: #3987e5;
+  --accent-soft: #16243a;
+  --accent-text: #86b6ef;
+
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+
+  --callout-note: #3987e5;
+  --callout-note-bg: #15233a;
+  --callout-tip: #199e70;
+  --callout-tip-bg: #10251f;
+  --callout-important: #9085e9;
+  --callout-important-bg: #201d33;
+  --callout-warning: #c98500;
+  --callout-warning-bg: #2a2110;
+  --callout-caution: #e66767;
+  --callout-caution-bg: #301818;
+  --callout-quote: #8e8d84;
+  --callout-quote-bg: #232322;
+
+  --code-bg: #202020;
+  --code-border: #33332f;
+  --highlight-bg: #2a2110;
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-2: 0 4px 14px rgb(0 0 0 / 45%);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--surface-0);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

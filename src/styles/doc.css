@@ -1,0 +1,564 @@
+/* Document typography and every block component. Deck mode reuses all of it. */
+
+.doc {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.block { position: relative; }
+
+/* --- headings ------------------------------------------------------------ */
+
+.md-heading {
+  position: relative;
+  line-height: 1.25;
+  letter-spacing: -0.011em;
+  scroll-margin-top: 5rem;
+  font-weight: 650;
+}
+
+h1.md-heading { font-size: 2.25rem; margin: 0 0 1rem; letter-spacing: -0.021em; }
+h2.md-heading { font-size: 1.6rem; margin: 3rem 0 1rem; letter-spacing: -0.016em; }
+h3.md-heading { font-size: 1.25rem; margin: 2.25rem 0 0.75rem; }
+h4.md-heading { font-size: 1.0625rem; margin: 1.75rem 0 0.5rem; }
+h5.md-heading, h6.md-heading {
+  font-size: 0.9375rem;
+  margin: 1.5rem 0 0.5rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+h2.md-heading::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--border);
+  margin-top: 0.75rem;
+}
+
+.heading-anchor {
+  position: absolute;
+  left: -1.25rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  font-weight: 400;
+}
+
+.md-heading:hover .heading-anchor,
+.heading-anchor:focus-visible { opacity: 1; }
+
+/* --- prose --------------------------------------------------------------- */
+
+.md-paragraph { margin: 0 0 1.1rem; }
+
+.doc a { color: var(--accent-text); text-underline-offset: 2px; }
+.doc a:hover { text-decoration-thickness: 2px; }
+
+.inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-sm);
+  padding: 0.1em 0.35em;
+}
+
+.md-rule {
+  border: 0;
+  height: 1px;
+  background: var(--border);
+  margin: 2.5rem 0;
+}
+
+.md-quote {
+  margin: 1.5rem 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 3px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.md-quote .md-paragraph:last-child { margin-bottom: 0; }
+
+.md-figure { margin: 2rem 0; text-align: center; }
+.md-figure img { max-width: 100%; border-radius: var(--radius); }
+.md-figure figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.md-html { margin: 1.25rem 0; }
+.md-html img { max-width: 100%; }
+
+/* --- lists --------------------------------------------------------------- */
+
+.md-list { margin: 0 0 1.1rem; padding-left: 1.5rem; }
+.md-list.is-loose > li { margin-bottom: 0.75rem; }
+.md-list > li { margin-bottom: 0.25rem; }
+.md-list > li > .block > .md-paragraph:last-child { margin-bottom: 0; }
+.md-list .md-list { margin-top: 0.25rem; margin-bottom: 0; }
+
+.md-list.is-tasks { list-style: none; padding-left: 0.25rem; }
+.md-list.is-tasks .task-item { display: flex; gap: 0.6rem; align-items: baseline; }
+.md-list.is-tasks input { accent-color: var(--accent); margin: 0; }
+
+/* --- tables -------------------------------------------------------------- */
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+}
+
+.md-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.md-table th,
+.md-table td {
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.md-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+
+.md-table tbody tr:last-child td { border-bottom: 0; }
+
+/* --- code ---------------------------------------------------------------- */
+
+.code-figure {
+  margin: 1.5rem 0;
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--code-bg);
+}
+
+.code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0.5rem 0.4rem 0.9rem;
+  border-bottom: 1px solid var(--code-border);
+  background: var(--surface-2);
+  min-height: 2.25rem;
+}
+
+.code-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.code-copy {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.code-copy:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+.code-block,
+.code-block pre {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  background: transparent;
+}
+
+.code-block pre { padding: 0; }
+.code-block code { font-family: inherit; }
+
+/* Shiki emits both themes as custom properties, so switching is a CSS swap
+   rather than a re-highlight. */
+.shiki, .shiki span { color: var(--shiki-light); background-color: transparent; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .shiki,
+  :root:not([data-theme='light']) .shiki span { color: var(--shiki-dark); }
+}
+
+:root[data-theme='dark'] .shiki,
+:root[data-theme='dark'] .shiki span { color: var(--shiki-dark); }
+
+.shiki .line { display: inline-block; width: 100%; }
+.shiki .line-highlight {
+  background: var(--highlight-bg);
+  box-shadow: inset 2px 0 0 var(--callout-warning);
+}
+
+/* --- math & diagrams ----------------------------------------------------- */
+
+.math-block { margin: 1.75rem 0; overflow-x: auto; text-align: center; }
+.mermaid-figure { margin: 1.75rem 0; text-align: center; }
+.mermaid-svg svg { max-width: 100%; height: auto; }
+.mermaid-loading { color: var(--text-muted); font-size: 0.875rem; padding: 2rem; }
+
+/* --- callouts ------------------------------------------------------------ */
+
+.callout {
+  display: flex;
+  gap: 0.85rem;
+  margin: 1.5rem 0;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--callout-note);
+  background: var(--callout-note-bg);
+}
+
+.callout-icon {
+  flex: 0 0 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-inverse);
+  background: var(--callout-note);
+  margin-top: 0.15rem;
+}
+
+.callout-body { min-width: 0; flex: 1; }
+.callout-body > .block > .md-paragraph:last-child { margin-bottom: 0; }
+
+.callout-kind {
+  margin: 0 0 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.callout-tip { border-left-color: var(--callout-tip); background: var(--callout-tip-bg); }
+.callout-tip .callout-icon { background: var(--callout-tip); }
+.callout-important { border-left-color: var(--callout-important); background: var(--callout-important-bg); }
+.callout-important .callout-icon { background: var(--callout-important); }
+.callout-warning { border-left-color: var(--callout-warning); background: var(--callout-warning-bg); }
+.callout-warning .callout-icon { background: var(--callout-warning); }
+.callout-caution { border-left-color: var(--callout-caution); background: var(--callout-caution-bg); }
+.callout-caution .callout-icon { background: var(--callout-caution); }
+.callout-quote { border-left-color: var(--callout-quote); background: var(--callout-quote-bg); }
+.callout-quote .callout-icon { background: var(--callout-quote); }
+
+/* --- cards --------------------------------------------------------------- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(var(--card-columns, 3), minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1.75rem 0;
+}
+
+.card {
+  padding: 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  box-shadow: var(--shadow-1);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.card > .block > .md-paragraph:last-child { margin-bottom: 0; }
+
+@media (max-width: 640px) {
+  .cards { grid-template-columns: 1fr; }
+}
+
+/* --- stepper ------------------------------------------------------------- */
+
+.stepper { list-style: none; margin: 1.75rem 0; padding: 0; counter-reset: step; }
+
+.step {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.9rem;
+  padding-bottom: 1.1rem;
+  position: relative;
+}
+
+.step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: 2.15rem;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.step-number {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  z-index: 1;
+}
+
+.step-body { padding-top: 0.2rem; min-width: 0; }
+.step-body > .block > .md-paragraph:last-child { margin-bottom: 0; }
+
+/* --- definitions --------------------------------------------------------- */
+
+.definitions { margin: 1.75rem 0; display: grid; gap: 0.6rem; }
+
+.definition {
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+}
+
+.definition dt { font-weight: 650; margin-bottom: 0.15rem; }
+.definition dd { margin: 0; color: var(--text-secondary); font-size: 0.9375rem; }
+
+/* --- comparison ---------------------------------------------------------- */
+
+.comparison {
+  display: grid;
+  grid-template-columns: repeat(var(--comparison-columns, 2), minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.75rem 0;
+}
+
+.comparison-column {
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+}
+
+.comparison-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.comparison-column .md-list { padding-left: 1.15rem; }
+
+@media (max-width: 640px) {
+  .comparison { grid-template-columns: 1fr; }
+}
+
+/* --- tree ---------------------------------------------------------------- */
+
+.tree { margin: 1.5rem 0; }
+.tree-list { list-style: none; margin: 0; padding-left: 0; }
+.tree-list .tree-list { padding-left: 1.15rem; border-left: 1px solid var(--border); margin-left: 0.4rem; }
+.tree-item { margin: 0.15rem 0; }
+.tree-leaf { padding: 0.15rem 0 0.15rem 1.35rem; position: relative; }
+
+.tree-leaf::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 0.85em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.tree-toggle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.15rem 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tree-caret {
+  color: var(--text-muted);
+  transition: transform 120ms ease;
+  display: inline-block;
+  width: 0.75rem;
+}
+
+.tree-branch.is-open > .tree-toggle .tree-caret { transform: rotate(90deg); }
+.tree-summary > .block > .md-paragraph { margin: 0; }
+
+/* --- charts -------------------------------------------------------------- */
+
+.chart-figure {
+  margin: 1.75rem 0;
+  padding: 1rem 1.1rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+}
+
+.chart-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.chart-caption {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.chart-toggle {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chart-toggle:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+.chart-plot { position: relative; }
+.chart-svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+.chart-grid { stroke: var(--border); stroke-width: 1; }
+.chart-axis { stroke: var(--border-strong); stroke-width: 1; }
+
+.chart-tick {
+  fill: var(--text-muted);
+  font-size: 11px;
+  font-family: var(--font-sans);
+  dominant-baseline: middle;
+}
+
+.chart-label {
+  fill: var(--text-secondary);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  dominant-baseline: middle;
+}
+
+/* Values and labels wear text tokens, never the series colour. */
+.chart-value {
+  fill: var(--text-primary);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  dominant-baseline: middle;
+}
+
+.chart-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+/* A 2px surface ring keeps a dot legible where it crosses another line. */
+.chart-dot { stroke: var(--surface-1); stroke-width: 2; }
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.chart-legend li { display: flex; align-items: center; gap: 0.4rem; }
+
+.chart-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: 0 0 10px;
+}
+
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -115%);
+  pointer-events: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2);
+  padding: 0.5rem 0.65rem;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  z-index: 5;
+}
+
+.chart-tooltip-title {
+  font-weight: 650;
+  margin-bottom: 0.3rem;
+  color: var(--text-primary);
+}
+
+.chart-tooltip-row { display: flex; align-items: center; gap: 0.45rem; }
+.chart-tooltip-name { color: var(--text-secondary); }
+.chart-tooltip-value { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* --- footnotes ----------------------------------------------------------- */
+
+.footnote-ref a { text-decoration: none; padding: 0 0.15em; }
+
+.footnotes {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.footnotes h2 { font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.footnotes li { margin-bottom: 0.5rem; scroll-margin-top: 5rem; }
+.footnotes .md-paragraph { display: inline; }
+.footnote-back { margin-left: 0.4rem; text-decoration: none; }
+
+/* --- progressive reveal -------------------------------------------------- */
+
+.is-pending {
+  opacity: 0.16;
+  filter: saturate(0.25);
+  transition: opacity 220ms ease, filter 220ms ease;
+}
