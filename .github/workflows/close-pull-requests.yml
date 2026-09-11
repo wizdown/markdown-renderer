@@ -2,6 +2,9 @@
 # cannot be disabled on public repos either. This closes incoming pull requests
 # automatically so the repository behaves as read-only in practice.
 #
+# Pull requests opened by the repository owner, organisation members, or invited
+# collaborators are left alone — the read-only policy is for outside proposals.
+#
 # It deliberately does not check out the head ref, so nothing from the fork is
 # ever executed here.
 name: Close pull requests
@@ -15,6 +18,11 @@ permissions:
 
 jobs:
   close:
+    # author_association is computed by GitHub from the author's permissions on
+    # this repository, so it cannot be spoofed by the pull request itself.
+    if: >-
+      github.event.pull_request.user.login != github.repository_owner &&
+      !contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7
