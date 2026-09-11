@@ -53,6 +53,10 @@
     "type": "git",
     "url": "git+https://github.com/wizdown/markdown-renderer.git"
   },
+  "homepage": "https://github.com/wizdown/markdown-renderer#readme",
+  "bugs": {
+    "url": "https://github.com/wizdown/markdown-renderer/issues"
+  },
   "keywords": [
     "markdown",
     "presentation",
